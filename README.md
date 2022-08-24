@@ -50,10 +50,9 @@ docker-compose down
 ```
 
 
-## Step 1
-Find the URL of the webpage that you want to scrape.  
- 
+## Step 1 : Find the URL of the webpage that you want to scrape.  
 
+The example url here is :<br>
 url : "http://quotes.toscrape.com/"
 
 The webpage that we are gonna scrape data from is a simple website for webscraping training, this is the simplest page to scrap, but if you are interested you can try the others.
@@ -65,18 +64,76 @@ We are going to scrap the Quotes and the Authors
   * **requests** Requests is a HTTP library for the Python programming language. The goal of the project is to make HTTP requests simpler and more human-friendly. <span> </span>
   * **bs4 for BeautifulSoup** Beautiful Soup is a Python package for parsing HTML and XML documents. It creates a parse tree for parsed pages that can be used to extract data from HTML, which is useful for web scraping.
 
-## Step 2
-Select the required elements by inspecting
+## Step 2 : Select the required elements by inspecting
 
 If you go on "http://quotes.toscrape.com/", and inspect the page, you will be able to see the elements of the html and you'd be able to understand what to scrap.
 
+As you can see, we have a `div class="quote"` that contains all the quote we want to scrap. Then, in each of these div, we have a `span class="text"` and a `small class="author"`.
+
+We now know what we want to gather and how to access them.
 
 
-###  
-Step 3: Write the code to get the content of the selected elements
+## Step 3 : Write the code to get the content of the selected elements
 
-We will be using the find_all functionality on BeautifulSoup to look for all the tags which contains the class name "cardOutline"
+First we need to requests the HTML from the website and parse it into a bs4 object :
+```
+req = requests.get(request.url)
+soupdata = bs4.BeautifulSoup(req.text, features="html.parser")
+```
 
+
+**Here is the code that need to be changed for another webpage**
+Access `src/python/bo/py` in the `on_scrap_request` function.
+
+We will be using the findAll functionality on BeautifulSoup to look for all the tags which contains the type div and the class quote :
+```
+divs = soupdata.findAll("div",{"class":"quote"})
+```
+
+Then, for each quote, we want to get the type span and class text, and the type small and class author :
+```
+for i in range(len(divs)):
+    text = divs[i].find("span",{"class":"text"}).text
+    author = divs[i].find("small", {"class":"author"}).text
+```
+
+We then put all those results in our IRIS message and send them back to you, the user.
+
+## Step 4 : Use the production
+You must access the `Production` following this link :
+```
+http://localhost:52795/csp/irisapp/EnsPortal.ProductionConfig.zen?PRODUCTION=iris.Production
+```
+
+And connect using :<br>
+```SuperUser``` as username and ```SYS``` as password.
+
+
+To call the scraping, click on the `Python.ScrapingOperation`, and select in the right tab `Actions`, you can `Test` the production.
+
+In this test window, select :
+
+Type of request : Grongier.PEX.Message
+
+For the classname you must enter :
+```
+msg.ScrapRequest
+```
+
+And for the json, you must enter the url you want to scrap :
+```
 {
   "url":"http://quotes.toscrape.com/"
 }
+```
+
+From here press `Invoke Testing Service` and watch the visual trace.
+
+By going on the last message and clicking on `contents` you shall see the scraped data.
+
+# Conclusion
+Here is the simplest example of scraping, it can be easily used by anyone and is implemented on IRIS, this means that with just a few tweaks you can connect this Operation [to a CRUD API](https://github.com/grongierisc/iris-python-flask-api-template) or to a automatic service that gather data from the web and input it into the IRIS DATABASE
+[This last link is in fact a link to a Formation in Python](https://github.com/LucasEnard/formation-template-python) on IRIS that shows how to use this module properly and how to connect to the IRIS DB or an external PostGres DB and doing so using a CRUD API.
+
+# References
+[See this post on the DC ](https://community.intersystems.com/post/introduction-web-scraping-embedded-python-let%E2%80%99s-extract-python-job%E2%80%99s) as my inspiration to do this GitHub.
