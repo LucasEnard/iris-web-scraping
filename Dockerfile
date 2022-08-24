@@ -11,7 +11,8 @@ COPY Installer.cls .
 COPY src src
 COPY iris.script /tmp/iris.script
 
-RUN pip3 install requests dataclasses-json
+RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    pip3 install -r requirements.txt
 
 RUN iris start IRIS \
 	&& iris session IRIS < /tmp/iris.script \

@@ -1,60 +1,82 @@
-## iris-interoperability-template
-This is a template of InterSystems IRIS Interoperability solution.
-It contains a simple interoperablity solution which reads data from Reddit, filters it and outputs into file or sends via email.
+# **What is Web Scraping:**
 
-## What The Sample Does
+In simple terms, **Web scraping**, **web harvesting**, or **web data extraction** is an automated process of collecting large data(unstructured) from websites. The user can extract all the data on particular sites or the specific data as per the requirement. The data collected can be stored in a structured format for further analysis.
 
-This sample has an interoperability [production](https://github.com/intersystems-community/iris-interoperability-template/blob/master/src/dc/Demo/Production.cls) with an inbound [Reddit Adapter](https://github.com/intersystems-community/iris-interoperability-template/blob/master/src/dc/Reddit/InboundAdapter.cls) which is used by a [Business Service](https://github.com/intersystems-community/iris-interoperability-template/blob/master/src/dc/Demo/RedditService.cls) to read data from Reddit.com.
-It reads from reddit.com/new/.json every 15 sec.
-You can alter both the URL and frequency in the service's settings.
-<img width="1411" alt="Screenshot 2020-10-29 at 19 33 14" src="https://user-images.githubusercontent.com/2781759/97603605-a6d0af00-1a1d-11eb-99cc-481efadb0ec6.png">
+<img alt="What is Web Scraping? — James Le" data-noaft="1" jsaction="load:XAeZkd;" jsname="HiaYvf" src="https://images.squarespace-cdn.com/content/v1/59d9b2749f8dce3ebe4e676d/1566319595811-MFGFIVQGNNSY2W4TZ4AV/web-scraping.png?format=1500w" />  
+  
+**Steps involved in web scraping:**
 
-The production has a business process with a rule, which filters on news that mentions cats and dogs. The business process then sends this data to a business operation which either saves data to a source folder /output/Dog.txt or /output/Cat.txt.
-<img width="864" alt="Screenshot 2020-10-29 at 19 38 58" src="https://user-images.githubusercontent.com/2781759/97606568-fcf32180-1a20-11eb-90de-4257dd2cf552.png"> 
+  1. Find the URL of the webpage that you want to scrape
+  2. Select the particular elements by inspecting
+  3. Write the code to get the content of the selected elements
+  4. Store the data in the required format
 
-## Prerequisites
-Make sure you have [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and [Docker desktop](https://www.docker.com/products/docker-desktop) installed.
+It’s that simple !!
 
-## Installation: ZPM
+## **The popular libraries/tools used for web scraping are:**
 
-Open IRIS Namespace with Interoperability Enabled.
-Open Terminal and call:
-USER>zpm "install interoperability-sample"
+  * Selenium – a framework for testing web applications
+  * BeautifulSoup – Python library for getting data out of HTML, XML, and other markup languages
+  * Pandas – Python library for data manipulation and analysis
 
-## Installation: Docker
-Clone/git pull the repo into any local directory
+##  BS4
+What is Beautiful Soup? {#what-is-beautiful-soup?}
 
+Beautiful Soup is a pure Python library for extracting structured data from a website. It allows you to parse data from HTML and XML files. It acts as a helper module and interacts with HTML in a similar and better way as to how you would interact with a web page using other available developer tools.
+
+  * It usually saves programmers hours or days of work since it works with your favorite parsers like `lxml` and `html5lib` to provide organic Python ways of navigating, searching, and modifying the parse tree.
+  * Another powerful and useful feature of beautiful soup is its intelligence to convert the documents being fetched to Unicode and outgoing documents to UTF-8. As a developer, you do not have to take care of that unless the document intrinsic doesn't specify an encoding or Beautiful Soup is unable to detect one.
+  * It is also considered to be **faster** when compared to other general parsing or scraping techniques.
+
+
+# **Using full Python to web scrap on IRIS**
+
+## The Production
+### Starting the Production
+
+While in the iris-web-scraping folder, open a terminal and enter :
 ```
-$ git clone https://github.com/intersystems-community/iris-interoperability-template.git
+docker-compose up
+```
+The very first time, it may take a few minutes to build the image correctly and install all the needed modules for Python.
+
+### Access the Production
+
+Following this link, access the production : [Access the Production](http://localhost:52795/csp/irisapp/EnsPortal.ProductionConfig.zen?PRODUCTION=iris.Production)
+
+### Closing the Production
+```
+docker-compose down
 ```
 
-Open the terminal in this directory and run:
 
-```
-$ docker-compose build
-```
+## Step 1
+Find the URL of the webpage that you want to scrape.  
+ 
 
-3. Run the IRIS container with your project:
+url : "http://quotes.toscrape.com/"
 
-```
-$ docker-compose up -d
-```
+The webpage that we are gonna scrape data from is a simple website for webscraping training, this is the simplest page to scrap, but if you are interested you can try the others.
+
+We are going to scrap the Quotes and the Authors
+  
+**We will be using two Python libraries.**<br>These were automatically installed at start up.
+
+  * **requests** Requests is a HTTP library for the Python programming language. The goal of the project is to make HTTP requests simpler and more human-friendly. <span> </span>
+  * **bs4 for BeautifulSoup** Beautiful Soup is a Python package for parsing HTML and XML documents. It creates a parse tree for parsed pages that can be used to extract data from HTML, which is useful for web scraping.
+
+## Step 2
+Select the required elements by inspecting
+
+If you go on "http://quotes.toscrape.com/", and inspect the page, you will be able to see the elements of the html and you'd be able to understand what to scrap.
 
 
 
-## How to Run the Sample
+###  
+Step 3: Write the code to get the content of the selected elements
 
-Open the [production](http://localhost:52795/csp/irisapp/EnsPortal.ProductionConfig.zen?PRODUCTION=dc.Demo.Production) and start it.
-It will start gathering news from reddit.com/new/ and filter it on cats and dogs into /output/Dog.txt or /output/Cat.txt files.
+We will be using the find_all functionality on BeautifulSoup to look for all the tags which contains the class name "cardOutline"
 
-You can alter the [business rule](http://localhost:52795/csp/irisapp/EnsPortal.RuleEditor.zen?RULE=dc.Demo.FilterPostsRoutingRule) to filter for different words, or to use an email operation to send posts via email.
-<img width="1123" alt="Screenshot 2020-10-29 at 20 05 34" src="https://user-images.githubusercontent.com/2781759/97607761-77707100-1a22-11eb-9ce8-0d14d6f6e315.png">
-
-## How to alter the template 
-Use the green    "Use this template" button on Github to copy files into a new repository and build a new IRIS interoperability solution using this one as an example.
-
-This repository is ready to code in VSCode with the ObjectScript plugin.
-Install [VSCode](https://code.visualstudio.com/), [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) and [ObjectScript](https://marketplace.visualstudio.com/items?itemName=daimor.vscode-objectscript) plugin and open the folder in VSCode.
-
-Use the handy VSCode menu to access the production and business rule editor and run a terminal:
-<img width="656" alt="Screenshot 2020-10-29 at 20 15 56" src="https://user-images.githubusercontent.com/2781759/97608650-aa673480-1a23-11eb-999e-61e889304e59.png">
+{
+  "url":"http://quotes.toscrape.com/"
+}
